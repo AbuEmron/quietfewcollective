@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>The Quiet Few Collective — Apps. Drops. Tools. Culture.</title>
+  <meta name="description" content="The Quiet Few Collective LLC — the house brand for quiet builders, sharp tools, and limited drops. Premium apps first, clothing next. Request access." />
+  <meta name="theme-color" content="#050504" />
+  <meta name="color-scheme" content="dark" />
+
+  <!-- Open Graph / social share (edit URL + image once the domain is live) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="The Quiet Few Collective" />
+  <meta property="og:title" content="The Quiet Few Collective" />
+  <meta property="og:description" content="Apps. Drops. Tools. Culture. Built for the few. Request access before the noise." />
+  <meta property="og:image" content="assets/quiet-few-emblem.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="preload" as="image" href="assets/quiet-few-emblem.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Ambient texture + desktop cursor glow (JS-driven, motion-safe) -->
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <a class="skip-link" href="#top">Skip to content</a>
+
+  <!-- ============================ HEADER ============================ -->
+  <header class="site-header" id="siteHeader">
+    <a class="brand" href="#top" aria-label="The Quiet Few Collective — home">
+      <img src="assets/quiet-few-emblem.png" alt="" width="46" height="46" />
+      <span class="brand-name">The Quiet Few<span class="brand-sub"> Collective</span></span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="#apps">Apps</a>
+      <a href="#drops">Drops</a>
+      <a href="#mission">Mission</a>
+      <a href="#waitlist" class="nav-cta magnetic">Join</a>
+    </nav>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <!-- Mobile drawer -->
+  <div class="mobile-nav" id="mobileNav" hidden>
+    <a href="#apps">Apps</a>
+    <a href="#drops">Drops</a>
+    <a href="#mission">Mission</a>
+    <a href="#waitlist" class="mobile-cta">Request Access</a>
+  </div>
+
+  <main id="top">
+    <!-- ============================ HERO ============================ -->
+    <section class="hero section" aria-labelledby="heroHeadline">
+      <div class="hero-copy">
+        <p class="eyebrow reveal">Serving food for thought</p>
+        <h1 id="heroHeadline" class="reveal">The house brand for quiet builders, sharp tools, and limited drops.</h1>
+        <p class="hero-sub reveal">
+          The Quiet Few Collective is the LLC home for apps first, clothing next, and a culture built
+          around discipline, precision, faith, craft, and moving without announcing every move.
+        </p>
+        <div class="hero-actions reveal">
+          <a href="#apps" class="btn primary magnetic">Enter The Collective</a>
+          <a href="#drops" class="btn secondary magnetic">See What&rsquo;s Coming</a>
+        </div>
+        <p class="hero-meta reveal">Apps. Drops. Tools. Culture. &mdash; Built for the few.</p>
+      </div>
+
+      <div class="hero-art reveal">
+        <div class="orb" aria-hidden="true"></div>
+        <div class="logo-stage tilt-card">
+          <div class="pulse-ring" aria-hidden="true"></div>
+          <div class="pulse-ring two" aria-hidden="true"></div>
+          <img src="assets/quiet-few-emblem.png" alt="The Quiet Few Collective emblem — a shushing figure over a serving dome, banner reading Serving Food For Thought." class="breathe" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ MARQUEE ============================ -->
+    <section class="marquee" aria-label="Brand values">
+      <div class="marquee-track" id="marqueeTrack">
+        <!-- Duplicated inline for a seamless loop; app.js keeps it filled on resize -->
+        <span>Quiet execution</span><span aria-hidden="true">&bull;</span>
+        <span>Premium apps</span><span aria-hidden="true">&bull;</span>
+        <span>Limited clothing</span><span aria-hidden="true">&bull;</span>
+        <span>Built for the few</span><span aria-hidden="true">&bull;</span>
+        <span>Quiet execution</span><span aria-hidden="true">&bull;</span>
+        <span>Premium apps</span><span aria-hidden="true">&bull;</span>
+        <span>Limited clothing</span><span aria-hidden="true">&bull;</span>
+        <span>Built for the few</span><span aria-hidden="true">&bull;</span>
+      </div>
+    </section>
+
+    <!-- ============================ MISSION ============================ -->
+    <section class="section manifesto" id="mission" aria-labelledby="missionHeadline">
+      <p class="section-kicker reveal">The feeling</p>
+      <h2 id="missionHeadline" class="reveal">Not loud. Not common. Not for everybody.</h2>
+      <p class="reveal">
+        The Quiet Few is a standard, not a volume. We build precise, useful products and release them
+        with intent &mdash; quiet confidence over noise, taste over trend, craft over churn. Every app and
+        every drop has a reason to exist. This is a door, not a billboard: the kind of place people want
+        access to because the work speaks and the circle stays small.
+      </p>
+    </section>
+
+    <!-- ============================ APPS HUB ============================ -->
+    <section class="section apps" id="apps" aria-labelledby="appsHeadline">
+      <header class="section-head">
+        <p class="section-kicker reveal">The parent hub</p>
+        <h2 id="appsHeadline" class="reveal">Apps under one serious roof.</h2>
+        <p class="section-lead reveal">
+          The Quiet Few Collective is the home and purchase hub for a growing line of premium,
+          native-feeling apps &mdash; installable, fast, and built to convert from day one.
+        </p>
+      </header>
+
+      <!-- Value props -->
+      <ul class="value-row" aria-label="What the hub delivers">
+        <li class="value reveal"><strong>One serious roof</strong><span>Field tools, faith, and education software under a single brand.</span></li>
+        <li class="value reveal"><strong>A hub built to convert</strong><span>Clean links to stores, digital products, and members-first access.</span></li>
+        <li class="value reveal"><strong>PWA from day one</strong><span>Installable, offline-ready shell, app-like feel on every screen.</span></li>
+      </ul>
+
+      <!-- Real app cards -->
+      <div class="app-grid">
+        <!-- Miqat -->
+        <article class="app-card reveal tilt-card">
+          <div class="app-top">
+            <span class="app-index">01</span>
+            <span class="badge badge-soon">Coming soon</span>
+          </div>
+          <h3>Miqat</h3>
+          <p class="app-cat">Prayer times &amp; adhan</p>
+          <p class="app-desc">Accurate prayer times, a clean adhan experience, and a calm, blueprint-precise interface for staying on time, every day.</p>
+          <!-- SWAP: set href to the live store/app URL. Keep data-app for analytics hooks. -->
+          <a class="app-link" href="#waitlist" data-app="miqat" aria-label="Get notified about Miqat">Get notified<span aria-hidden="true"> &rarr;</span></a>
+        </article>
+
+        <!-- Codewatt -->
+        <article class="app-card reveal tilt-card">
+          <div class="app-top">
+            <span class="app-index">02</span>
+            <span class="badge badge-soon">Coming soon</span>
+          </div>
+          <h3>Codewatt</h3>
+          <p class="app-cat">Electrician exam prep</p>
+          <p class="app-desc">Focused practice for the electrician&rsquo;s license &mdash; code lookups, question banks, and drill sessions built for people who&rsquo;d rather pass the first time.</p>
+          <a class="app-link" href="#waitlist" data-app="codewatt" aria-label="Get notified about Codewatt">Get notified<span aria-hidden="true"> &rarr;</span></a>
+        </article>
+
+        <!-- Wireway -->
+        <article class="app-card reveal tilt-card">
+          <div class="app-top">
+            <span class="app-index">03</span>
+            <span class="badge badge-soon">Coming soon</span>
+          </div>
+          <h3>Wireway</h3>
+          <p class="app-cat">Electrical estimating</p>
+          <p class="app-desc">Fast, field-ready electrical estimating &mdash; take-offs, labor units, and clean bid output for contractors who move precise.</p>
+          <a class="app-link" href="#waitlist" data-app="wireway" aria-label="Get notified about Wireway">Get notified<span aria-hidden="true"> &rarr;</span></a>
+        </article>
+
+        <!-- Three to Five -->
+        <article class="app-card reveal tilt-card">
+          <div class="app-top">
+            <span class="app-index">04</span>
+            <span class="badge badge-soon">Coming soon</span>
+          </div>
+          <h3>Three to Five</h3>
+          <p class="app-cat">IBEW apprentice hour tracker</p>
+          <p class="app-desc">Track apprenticeship hours, classifications, and milestones toward turning out &mdash; signed, sealed monthly reports and top-out projections for IBEW apprentices.</p>
+          <a class="app-link" href="#waitlist" data-app="threetofive" aria-label="Get notified about Three to Five">Get notified<span aria-hidden="true"> &rarr;</span></a>
+        </article>
+
+        <!-- Room for more -->
+        <article class="app-card app-card--placeholder reveal tilt-card" aria-label="More apps in development">
+          <div class="app-top">
+            <span class="app-index">05</span>
+            <span class="badge badge-quiet">In the lab</span>
+          </div>
+          <h3>More loading&hellip;</h3>
+          <p class="app-cat">The line keeps growing</p>
+          <p class="app-desc">New tools ship quietly. Join the list and members hear first when the next one drops.</p>
+          <a class="app-link" href="#waitlist" data-app="future">Request access<span aria-hidden="true"> &rarr;</span></a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================ DROPS ============================ -->
+    <section class="section drop-zone" id="drops" aria-labelledby="dropsHeadline">
+      <div class="drop-copy">
+        <p class="eyebrow reveal">Future clothing drops</p>
+        <h2 id="dropsHeadline" class="reveal">Scarcity without gimmicks.</h2>
+        <p class="reveal">
+          Clothing comes next &mdash; limited capsules released in small runs, no restocks, no noise. Early
+          access windows and a members-first preview mean the quiet list sees it before anyone else.
+          When the first capsule lands, it won&rsquo;t be announced twice.
+        </p>
+        <ul class="drop-points reveal" aria-label="How drops work">
+          <li>Limited releases &mdash; small runs, no restocks</li>
+          <li>Members hear first &mdash; early access windows</li>
+          <li>Quiet previews before the public sees a thing</li>
+        </ul>
+      </div>
+      <aside class="drop-card reveal" aria-label="First capsule status">
+        <img src="assets/quiet-few-wordmark-icon.png" alt="The Quiet Few wordmark and shushing icon" />
+        <p class="drop-status">First capsule loading</p>
+        <strong>Members hear first.</strong>
+      </aside>
+    </section>
+
+    <!-- ============================ WAITLIST ============================ -->
+    <section class="section waitlist" id="waitlist" aria-labelledby="waitlistHeadline">
+      <div class="waitlist-panel reveal">
+        <p class="eyebrow">Join before the noise</p>
+        <h2 id="waitlistHeadline">Become one of The Quiet Few.</h2>
+        <p class="waitlist-lead">Early access to apps, releases, and the first clothing drops. One quiet email when it matters &mdash; never noise.</p>
+
+        <!-- Waitlist form. Wiring lives in app.js -> submitWaitlist().
+             Backend is intentionally NOT connected: see README "Connect the waitlist". -->
+        <form id="waitlistForm" novalidate>
+          <label class="visually-hidden" for="waitlistEmail">Email address</label>
+          <input id="waitlistEmail" name="email" type="email" inputmode="email"
+                 autocomplete="email" placeholder="you@domain.com" required />
+          <!-- Honeypot: real users never fill this; bots do. -->
+          <input type="text" name="company" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <button class="btn primary" type="submit" id="waitlistBtn">Request Access</button>
+        </form>
+
+        <p class="micro" id="joinState" role="status" aria-live="polite">
+          Early access for apps, releases, and future clothing drops.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="site-footer">
+    <a class="footer-brand" href="#top" aria-label="Back to top">
+      <img src="assets/quiet-few-wordmark-icon.png" alt="The Quiet Few Collective" />
+    </a>
+    <p class="footer-copy">&copy; <span id="year">2026</span> The Quiet Few Collective LLC. Built quiet. Moved precise.</p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

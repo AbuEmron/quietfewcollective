@@ -1,0 +1,13 @@
+# Dependencies (only needed to regenerate icons via _tools/gen-icons.mjs)
+node_modules/
+package-lock.json
+
+# Local mockup reference (starter zip, not part of the shipped site)
+_mockup_ref/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

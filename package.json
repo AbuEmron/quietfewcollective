@@ -1,0 +1,14 @@
+{
+  "name": "quietfew-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Quiet Few Collective — premium parent-brand PWA (static site).",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "python3 -m http.server 5173",
+    "icons": "node _tools/gen-icons.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3"
+  }
+}
