@@ -14,9 +14,14 @@
   const yearEl = $("#year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ---------- header scrolled state + scroll progress ---------- */
+  const root = document.documentElement;
+
+  /* ---------- header scrolled state + scroll progress + atmosphere parallax ----------
+     One passive scroll listener; the atmosphere parallax is a single CSS-var
+     write applied to a composited, fixed layer (no layout thrash). */
   const header = $("#siteHeader");
   const progress = $("#scrollProgress");
+  const parallaxAllowed = !prefersReduced;   // off entirely for reduced-motion
   const onScroll = () => {
     const y = window.scrollY || document.documentElement.scrollTop;
     if (header) header.classList.toggle("scrolled", y > 24);
@@ -24,26 +29,46 @@
       const h = document.documentElement.scrollHeight - window.innerHeight;
       progress.style.width = (h > 0 ? (y / h) * 100 : 0) + "%";
     }
+    if (parallaxAllowed) {
+      // gentle: colour masses lag the scroll a touch for depth (capped)
+      root.style.setProperty("--atm-scroll", Math.min(y * 0.05, 120) + "px");
+    }
   };
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* ---------- cursor glow (desktop, smoothed) ---------- */
-  const glow = $("#cursorGlow");
-  if (glow && isFinePointer && !prefersReduced) {
+  /* ---------- living atmosphere: delayed cursor glow (desktop / fine pointer) ----------
+     Heavily smoothed so it reads as slow illumination drifting toward the
+     cursor — deliberately NOT a flashlight or trail. rAF runs ONLY while the
+     glow still has ground to cover, then idles. */
+  const atmosphere = $("#livingAtmosphere");
+  const laGlow = $("#laGlow");
+  if (laGlow && isFinePointer && !prefersReduced) {
     let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
-    let cx = tx, cy = ty, shown = false;
+    let cx = tx, cy = ty, shown = false, running = false;
+    const step = () => {
+      cx += (tx - cx) * 0.045;
+      cy += (ty - cy) * 0.045;
+      laGlow.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+      if (Math.abs(tx - cx) > 0.4 || Math.abs(ty - cy) > 0.4) {
+        requestAnimationFrame(step);
+      } else {
+        running = false;
+      }
+    };
+    const kick = () => { if (!running) { running = true; requestAnimationFrame(step); } };
     window.addEventListener("pointermove", (e) => {
       tx = e.clientX; ty = e.clientY;
-      if (!shown) { glow.style.opacity = "1"; shown = true; }
+      if (!shown) { laGlow.classList.add("is-live"); shown = true; }
+      kick();
     }, { passive: true });
-    const raf = () => {
-      cx += (tx - cx) * 0.14;
-      cy += (ty - cy) * 0.14;
-      glow.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
-      requestAnimationFrame(raf);
-    };
-    requestAnimationFrame(raf);
+  }
+
+  /* ---------- pause the atmosphere when the tab is hidden (GPU idles) ---------- */
+  if (atmosphere) {
+    document.addEventListener("visibilitychange", () => {
+      atmosphere.classList.toggle("is-paused", document.hidden);
+    });
   }
 
   /* ---------- scroll reveals ---------- */

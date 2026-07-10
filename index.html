@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>The Quiet Few Collective — Apps. Drops. Tools. Culture.</title>
   <meta name="description" content="The Quiet Few Collective LLC — the house brand for quiet builders, sharp tools, and limited drops. Premium apps first, clothing next. Request access." />
-  <meta name="theme-color" content="#050504" />
+  <meta name="theme-color" content="#050507" />
   <meta name="color-scheme" content="dark" />
 
   <!-- Open Graph / social share (edit URL + image once the domain is live) -->
@@ -24,9 +24,31 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Ambient texture + desktop cursor glow (JS-driven, motion-safe) -->
+  <!-- ===================== LIVING ATMOSPHERE =====================
+       Cinematic ambient background, mounted BEHIND all content
+       (z-index:-1, pointer-events:none). Cohesive smoke + colour +
+       mist + delayed cursor glow + vignette. Motion driven by CSS;
+       app.js adds a delayed desktop glow, gentle scroll parallax, and
+       pauses everything when the tab is hidden. -->
+  <div class="living-atmosphere" id="livingAtmosphere" aria-hidden="true">
+    <div class="la-base"></div>
+    <div class="la-masses">
+      <span class="la-mass la-mass--cobalt"></span>
+      <span class="la-mass la-mass--violet"></span>
+      <span class="la-mass la-mass--indigo"></span>
+      <span class="la-mass la-mass--cyan"></span>
+      <span class="la-mass la-mass--silver"></span>
+      <span class="la-mass la-mass--magenta"></span>
+    </div>
+    <div class="la-smoke la-smoke--a"></div>
+    <div class="la-smoke la-smoke--b"></div>
+    <div class="la-mist"></div>
+    <div class="la-glow" id="laGlow"></div>
+    <div class="la-vignette"></div>
+  </div>
+
+  <!-- Filmic grain sits ABOVE content for texture; scroll progress bar -->
   <div class="grain" aria-hidden="true"></div>
-  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
   <a class="skip-link" href="#top">Skip to content</a>

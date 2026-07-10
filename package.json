@@ -5,10 +5,12 @@
   "description": "The Quiet Few Collective — premium parent-brand PWA (static site).",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "python3 -m http.server 5173",
-    "icons": "node _tools/gen-icons.mjs"
+    "start": "node _tools/serve.mjs 5178",
+    "icons": "node _tools/gen-icons.mjs",
+    "smoke": "node _tools/smoke.mjs"
   },
   "devDependencies": {
+    "puppeteer": "^25.3.0",
     "sharp": "^0.35.3"
   }
 }
