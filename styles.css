@@ -77,14 +77,22 @@ body {
 }
 .living-atmosphere > * { position: absolute; pointer-events: none; }
 
-/* (1) base floor — cool near-black with a subtle midnight-navy depth.
-   Also the always-visible backdrop the GL canvas draws additively over. */
+/* (1) base floor — the ALWAYS-visible backdrop the transparent GL canvas draws
+   additively over. It carries a subtle dark-navy → indigo/cobalt/violet wash
+   drawn from the smoke palette, so the atmosphere is NEVER pure black even if
+   WebGL fails to init, the canvas ends up 0-sized, or rAF never starts (the
+   iOS installed-PWA / standalone failure mode). Tints are low-alpha and kept
+   to the edges; the central reading column stays deep so cream text stays
+   razor-sharp — desktop / normal-tab smoke sits over this unchanged. */
 .la-base {
   inset: 0;
   background:
-    radial-gradient(120% 90% at 50% 8%, var(--atm-navy) 0%, transparent 55%),
-    radial-gradient(120% 120% at 50% 118%, var(--atm-char) 0%, transparent 60%),
-    var(--atm-base);
+    radial-gradient(70% 60% at 82% 6%,  rgba(38, 71, 255, .16) 0%, transparent 60%),   /* cobalt, top-right */
+    radial-gradient(75% 65% at 14% 92%, rgba(90, 44, 232, .15) 0%, transparent 62%),    /* violet, bottom-left */
+    radial-gradient(60% 50% at 92% 78%, rgba(35, 196, 220, .09) 0%, transparent 60%),   /* cyan whisper */
+    radial-gradient(120% 100% at 50% 4%, var(--atm-indigo) 0%, transparent 58%),        /* indigo crown */
+    radial-gradient(120% 120% at 50% 120%, var(--atm-char) 0%, transparent 60%),
+    #070c1a;   /* deep midnight-navy floor — reads as dark blue, never black */
 }
 
 /* (2) WebGL smoke canvas — fills the viewport; sized in device pixels by JS.
@@ -120,8 +128,9 @@ body {
 .la-vignette {
   inset: 0;
   background:
-    radial-gradient(115% 85% at 50% 42%, transparent 38%, rgba(5, 5, 7, .55) 100%),
-    radial-gradient(60% 45% at 50% 34%, rgba(5, 5, 7, .35), transparent 70%);
+    /* navy-tinted (not near-black) so the colour floor survives at the edges */
+    radial-gradient(115% 85% at 50% 42%, transparent 38%, rgba(7, 11, 24, .52) 100%),
+    radial-gradient(60% 45% at 50% 34%, rgba(6, 9, 18, .34), transparent 70%);
 }
 
 /* ---------- filmic grain (kept, retuned cooler; sits above content) ---------- */

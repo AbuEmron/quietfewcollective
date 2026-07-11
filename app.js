@@ -407,11 +407,22 @@
     gl.disable(gl.DEPTH_TEST);
 
     // Sizing -------------------------------------------------------------
+    // Prefer visualViewport: in an iOS installed PWA (standalone) window.inner*
+    // can report a stale/zero size at launch under viewport-fit=cover, which
+    // sizes the canvas to 0 → nothing paints → the near-black floor shows
+    // ("black background" bug). visualViewport reflects the real drawable area.
     let W = 0, H = 0;
+    const viewportSize = () => {
+      const vv = window.visualViewport;
+      const cssW = (vv && vv.width) || window.innerWidth || document.documentElement.clientWidth || 1;
+      const cssH = (vv && vv.height) || window.innerHeight || document.documentElement.clientHeight || 1;
+      return { cssW, cssH };
+    };
     const resize = () => {
+      const { cssW, cssH } = viewportSize();
       const dpr = Math.min(window.devicePixelRatio || 1, dprCap) * renderScale;
-      W = Math.max(1, Math.round(window.innerWidth * dpr));
-      H = Math.max(1, Math.round(window.innerHeight * dpr));
+      W = Math.max(1, Math.round(cssW * dpr));
+      H = Math.max(1, Math.round(cssH * dpr));
       if (canvas.width !== W || canvas.height !== H) {
         canvas.width = W;
         canvas.height = H;
@@ -472,6 +483,13 @@
     // Reveal once we know the first frame is on screen.
     const reveal = () => canvas.classList.add("is-live");
 
+    // Re-measure + repaint on demand. When the loop is running it will pick up
+    // the new size on its next frame, so we only force a manual draw when idle.
+    const kick = () => {
+      resize();
+      if (running) { last = 0; } else { draw(); }
+    };
+
     if (prefersReduced) {
       // Beautiful STATIC frame — render one warmed-up moment, no loop.
       t = 14.0;
@@ -485,14 +503,45 @@
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) stop(); else start();
       });
+
+      // iOS standalone launch quirks: the viewport can be reported stale/zero on
+      // first paint and rAF is sometimes deferred until the window settles. A
+      // couple of deferred re-kicks re-measure and repaint once it's real.
+      window.addEventListener("load", kick);
+      const standalone = navigator.standalone === true ||
+        window.matchMedia("(display-mode: standalone)").matches;
+      if (standalone) {
+        setTimeout(kick, 60);
+        setTimeout(kick, 400);
+      }
+
+      // Watchdog: if no frame has landed shortly after init (rAF never fired, or
+      // the buffer came up 0-sized), force one draw + reveal. If it still can't
+      // produce a real-sized buffer, drop to the static CSS fallback. Either way
+      // the enriched .la-base guarantees the background is never pure black.
+      setTimeout(() => {
+        if (canvas.classList.contains("is-live")) return;
+        resize();
+        if (W < 2 || H < 2) { useFallback(); return; }
+        draw();
+        reveal();
+        if (!running) start();
+      }, 700);
     }
 
     // Resize is cheap (only reallocs the buffer when dimensions change).
+    // orientationchange + visualViewport cover mobile / standalone rotations and
+    // the iOS URL-bar / safe-area viewport shifts that plain "resize" can miss.
     let rz = 0;
-    window.addEventListener("resize", () => {
+    const onResize = () => {
       clearTimeout(rz);
-      rz = setTimeout(() => { if (!running) draw(); }, 150);
-    }, { passive: true });
+      rz = setTimeout(kick, 150);
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("orientationchange", onResize, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onResize, { passive: true });
+    }
 
     // Context loss / recovery + teardown.
     canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); stop(); }, false);
