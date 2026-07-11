@@ -328,16 +328,22 @@
         float far  = smoke(p * 0.85 + vec2(0.020 * t, 0.012 * t), t * 0.5, oct - 1.0, wFar);
         float near = smoke(p * 1.70 - vec2(0.030 * t, 0.020 * t), t * 0.8, oct,       wNear);
 
-        float density = smoothstep(0.30, 0.95, mix(far, near, 0.5));
+        float density = smoothstep(0.26, 0.90, mix(far, near, 0.5));
 
         // Colour lives inside the smoke: hue drifts with the far warp field.
         float hue = clamp((wFar.x + wFar.y) * 0.5, 0.0, 1.0);
         vec3 col = ramp(hue);
 
         // Restrained silver / magenta accents from the near field (sparse).
+        // Silver kept light so it tints without greying the whole field out.
         float acc = clamp((wNear.x + wNear.y) * 0.5, 0.0, 1.0);
-        col = mix(col, vec3(0.62, 0.68, 0.80), smoothstep(0.66, 0.82, acc) * 0.45); // smoky silver
-        col = mix(col, vec3(0.70, 0.20, 0.55), smoothstep(0.84, 0.96, acc) * 0.30); // magenta
+        col = mix(col, vec3(0.62, 0.68, 0.80), smoothstep(0.68, 0.84, acc) * 0.30); // smoky silver
+        col = mix(col, vec3(0.72, 0.20, 0.56), smoothstep(0.83, 0.96, acc) * 0.34); // magenta
+
+        // Gently lift saturation so the abstract colour reads through the smoke
+        // (still restrained — nowhere near neon).
+        float lum = dot(col, vec3(0.299, 0.587, 0.114));
+        col = clamp(mix(vec3(lum), col, 1.28), 0.0, 1.0);
 
         // Energy sits OUTSIDE the central reading column; soft clearing behind
         // the hero text (upper-centre) keeps cream typography razor-sharp.
@@ -349,7 +355,7 @@
 
         float amt = density * clearing;
 
-        vec3 color = col * amt * 0.95;
+        vec3 color = col * amt * 1.12;
 
         // A very subtle desktop cursor illumination, still clearing-masked.
         float m = smoothstep(0.34, 0.0, distance(vec2(uv.x * aspect, uv.y),
