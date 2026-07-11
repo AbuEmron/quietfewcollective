@@ -26,8 +26,6 @@
   --atm-cyan:    #23c4dc;   /* cool cyan */
   --atm-silver:  #9aa6c2;   /* smoky silver */
   --atm-magenta: #b23a8e;   /* VERY restrained magenta accent */
-  /* scroll-driven parallax offset (px), set by app.js on capable devices */
-  --atm-scroll:  0px;
 
   --font-display: "Hoefler Text", "Iowan Old Style", "Apple Garamond",
                   Baskerville, "Georgia", "Times New Roman", serif;
@@ -55,16 +53,17 @@ body {
 }
 
 /* =====================================================================
-   LIVING ATMOSPHERE
+   LIVING ATMOSPHERE  (v2 — WebGL volumetric smoke)
    Reusable full-viewport ambient background mounted behind ALL content.
    Layer stack (back → front):
-     .la-base      near-black + midnight-navy gradient floor
-     .la-masses    large blurred colored light masses (screen blend)
-     .la-smoke     drifting fractal-noise smoke (soft-light) — 2 layers
-     .la-mist      fine volumetric mist (overlay) — 1 slow layer
-     .la-glow      delayed cursor-reactive illumination (desktop, JS)
+     .la-base      near-black + midnight-navy gradient floor (static CSS)
+     .la-canvas    WebGL fragment shader — domain-warped fbm smoke with the
+                   brand palette embedded and depth layers (all motion here)
+     .la-fallback  STATIC colour composition for no-WebGL / low-end
+                   (hidden unless .living-atmosphere.no-webgl)
      .la-vignette  edge vignette + central "clearing" for readability
-   All GPU-friendly: only transform/opacity animate; never layout props.
+   The single GL canvas replaced the old stack of animated blur()+mix-blend
+   layers (feTurbulence sheets, 6 blurred masses) that caused repaint jank.
    pointer-events:none throughout so it never blocks UI.
    ===================================================================== */
 .living-atmosphere {
@@ -78,7 +77,8 @@ body {
 }
 .living-atmosphere > * { position: absolute; pointer-events: none; }
 
-/* (1) base floor — cool near-black with a subtle midnight-navy depth */
+/* (1) base floor — cool near-black with a subtle midnight-navy depth.
+   Also the always-visible backdrop the GL canvas draws additively over. */
 .la-base {
   inset: 0;
   background:
@@ -87,72 +87,36 @@ body {
     var(--atm-base);
 }
 
-/* (2) large blurred colored light masses — the "abstract color beneath fog" */
-.la-masses { inset: -20%; will-change: transform; transform: translate3d(0, var(--atm-scroll), 0); }
-.la-mass {
+/* (2) WebGL smoke canvas — fills the viewport; sized in device pixels by JS.
+   No blur / blend here: the shader composites everything internally, so the
+   browser only uploads one GPU-rendered layer → smooth, no repaint jank. */
+.la-canvas {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;                       /* JS fades in once the first frame paints */
+  transition: opacity 1.1s ease;
+}
+.la-canvas.is-live { opacity: 1; }
+
+/* (2b) STATIC fallback — tasteful frozen colour composition when WebGL is
+   unavailable or the device is deemed low-end. No animation, cheap to paint. */
+.la-fallback { inset: 0; display: none; }
+.living-atmosphere.no-webgl .la-canvas { display: none; }
+.living-atmosphere.no-webgl .la-fallback { display: block; }
+.la-fb {
   position: absolute;
-  width: 60vw; height: 60vw;
   border-radius: 50%;
-  filter: blur(70px);
-  mix-blend-mode: screen;   /* adds light into darkness, keeps blacks black */
-  opacity: .4;
-  will-change: transform, opacity;
-}
-/* colours + placement — energy sits OUTSIDE the central reading column */
-.la-mass--cobalt  { top: -8%;  left: -6%;  background: radial-gradient(circle at 50% 50%, var(--atm-cobalt), transparent 62%); animation: la-mass-a 46s ease-in-out infinite; }
-.la-mass--violet  { top: 34%;  right: -12%; background: radial-gradient(circle at 50% 50%, var(--atm-violet), transparent 62%); animation: la-mass-b 58s ease-in-out infinite; }
-.la-mass--indigo  { bottom: -14%; left: 8%; width: 70vw; height: 70vw; background: radial-gradient(circle at 50% 50%, var(--atm-indigo), transparent 66%); opacity: .5; animation: la-mass-c 52s ease-in-out infinite; }
-.la-mass--cyan    { top: 6%;   right: 4%;  width: 44vw; height: 44vw; background: radial-gradient(circle at 50% 50%, var(--atm-cyan), transparent 60%); opacity: .28; animation: la-mass-d 40s ease-in-out infinite; }
-.la-mass--silver  { bottom: 2%; right: -8%; width: 50vw; height: 50vw; background: radial-gradient(circle at 50% 50%, var(--atm-silver), transparent 64%); opacity: .22; animation: la-mass-e 63s ease-in-out infinite; }
-.la-mass--magenta { bottom: 30%; left: -14%; width: 40vw; height: 40vw; background: radial-gradient(circle at 50% 50%, var(--atm-magenta), transparent 62%); opacity: .16; animation: la-mass-f 55s ease-in-out infinite; }
-
-/* (3) drifting smoke — fractal noise, soft-light over the colour masses.
-   Two layers, opposite directions, different scales → never an obvious loop. */
-.la-smoke {
-  inset: -30%;
-  background-repeat: repeat;
-  mix-blend-mode: soft-light;
-  will-change: transform;
-}
-.la-smoke--a {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.009 0.013' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
-  background-size: 130% 130%;
-  opacity: .5;
-  animation: la-smoke-a 61s ease-in-out infinite;
-}
-.la-smoke--b {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.026' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
-  background-size: 95% 95%;
-  opacity: .32;
-  animation: la-smoke-b 47s ease-in-out infinite;
-}
-
-/* (4) fine volumetric mist — very slow, low-contrast, adds air */
-.la-mist {
-  inset: -20%;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05 0.06' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
-  background-size: 60% 60%;
-  mix-blend-mode: overlay;
-  opacity: .14;
-  will-change: transform;
-  animation: la-mist 90s linear infinite;
-}
-
-/* (5) delayed cursor-reactive illumination — desktop only (JS toggles .is-live) */
-.la-glow {
-  top: 0; left: 0;
-  width: 42rem; height: 42rem;
-  margin: -21rem 0 0 -21rem;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(60, 110, 255, .10), rgba(35, 196, 220, .05) 40%, transparent 66%);
+  filter: blur(64px);
   mix-blend-mode: screen;
-  opacity: 0;
-  transition: opacity .8s ease;
-  will-change: transform;
 }
-.la-glow.is-live { opacity: 1; }
+.la-fb--cobalt { top: -10%; left: -8%;  width: 62vw; height: 62vw; opacity: .40; background: radial-gradient(circle at 50% 50%, var(--atm-cobalt), transparent 62%); }
+.la-fb--violet { top: 30%;  right: -12%; width: 58vw; height: 58vw; opacity: .34; background: radial-gradient(circle at 50% 50%, var(--atm-violet), transparent 62%); }
+.la-fb--indigo { bottom: -16%; left: 6%; width: 70vw; height: 70vw; opacity: .46; background: radial-gradient(circle at 50% 50%, var(--atm-indigo), transparent 66%); }
+.la-fb--cyan   { top: 4%;   right: 2%;   width: 42vw; height: 42vw; opacity: .24; background: radial-gradient(circle at 50% 50%, var(--atm-cyan), transparent 60%); }
 
-/* (6) vignette + central clearing — protects the cream reading column */
+/* (3) vignette + central clearing — protects the cream reading column */
 .la-vignette {
   inset: 0;
   background:
@@ -708,45 +672,8 @@ h3 { font-size: clamp(1.5rem, 2.6vw, 2.1rem); letter-spacing: -.02em; }
   to   { transform: translateX(-50%); }
 }
 
-/* ---- Living Atmosphere drift — GPU transform/opacity only, never layout.
-   0% == 100% so every cycle returns home with no jump; distinct mid-states
-   and staggered durations mean the layers never visibly re-sync (no loop). ---- */
-@keyframes la-mass-a { /* cobalt · top-left · eases down-right, breathes open */
-  0%,100% { transform: translate3d(0,0,0) scale(1);        opacity: .40; }
-  50%     { transform: translate3d(7vw,5vh,0) scale(1.18); opacity: .52; }
-}
-@keyframes la-mass-b { /* violet · right · drifts up-left */
-  0%,100% { transform: translate3d(0,0,0) scale(1.05);      opacity: .38; }
-  50%     { transform: translate3d(-9vw,-6vh,0) scale(.86);  opacity: .5; }
-}
-@keyframes la-mass-c { /* indigo · bottom-left · slow wide swell */
-  0%,100% { transform: translate3d(0,0,0) scale(1);        opacity: .5; }
-  50%     { transform: translate3d(5vw,-4vh,0) scale(1.22); opacity: .38; }
-}
-@keyframes la-mass-d { /* cyan · top-right · small quick-ish shimmer */
-  0%,100% { transform: translate3d(0,0,0) scale(.92);       opacity: .28; }
-  50%     { transform: translate3d(-5vw,4vh,0) scale(1.1);   opacity: .4; }
-}
-@keyframes la-mass-e { /* silver · bottom-right · lazy sideways glide */
-  0%,100% { transform: translate3d(0,0,0) scale(1.08);      opacity: .22; }
-  50%     { transform: translate3d(-7vw,-3vh,0) scale(.9);   opacity: .32; }
-}
-@keyframes la-mass-f { /* restrained magenta · barely-there pulse */
-  0%,100% { transform: translate3d(0,0,0) scale(1);        opacity: .12; }
-  50%     { transform: translate3d(6vw,3vh,0) scale(1.14);  opacity: .2; }
-}
-@keyframes la-smoke-a { /* large fractal sheet · slow down-right creep + swell */
-  0%,100% { transform: translate3d(0,0,0) scale(1.12); }
-  50%     { transform: translate3d(4%,3%,0) scale(1.24); }
-}
-@keyframes la-smoke-b { /* finer sheet · opposite up-left creep */
-  0%,100% { transform: translate3d(0,0,0) scale(1); }
-  50%     { transform: translate3d(-5%,-4%,0) scale(1.15); }
-}
-@keyframes la-mist { /* very slow, low-contrast breathing air */
-  0%,100% { transform: translate3d(0,0,0) scale(1.05); }
-  50%     { transform: translate3d(3%,-2%,0) scale(1.16); }
-}
+/* (Living Atmosphere drift keyframes removed in v2 — all smoke motion now
+   lives in the WebGL shader; the old CSS mass/smoke/mist layers are gone.) */
 
 /* ============================ RESPONSIVE ============================ */
 @media (max-width: 960px) {
@@ -757,13 +684,9 @@ h3 { font-size: clamp(1.5rem, 2.6vw, 2.1rem); letter-spacing: -.02em; }
   .value-row { grid-template-columns: 1fr; }
   .app-grid { grid-template-columns: 1fr 1fr; }
   .drop-zone { grid-template-columns: 1fr; }
-
-  /* Atmosphere — tablet tier: lighter blur, dial back the busiest layers */
-  .la-mass { filter: blur(52px); }
-  .la-smoke--a { opacity: .38; }
-  .la-smoke--b { opacity: .24; }
-  .la-mist { opacity: .1; }
-  .la-glow { display: none; }              /* no pointer systems below desktop */
+  /* Atmosphere: cost tiers (DPR cap, render scale, octaves) are handled by
+     app.js per device. Fallback masses soften a touch on smaller screens. */
+  .la-fb { filter: blur(52px); }
 }
 @media (max-width: 620px) {
   .app-grid { grid-template-columns: 1fr; }
@@ -772,16 +695,10 @@ h3 { font-size: clamp(1.5rem, 2.6vw, 2.1rem); letter-spacing: -.02em; }
   #waitlistForm .btn { width: 100%; }
   .brand-sub { display: none; }
 
-  /* Atmosphere — mobile tier: fewer layers, lower blur, no overheating.
-     Keep cobalt + violet + indigo colour story; drop the accent masses,
-     the finer smoke sheet, and the mist to stay light on the GPU. */
-  .la-mass { filter: blur(40px); }
-  .la-mass--cyan,
-  .la-mass--silver,
-  .la-mass--magenta { display: none; }
-  .la-smoke--b,
-  .la-mist { display: none; }
-  .la-smoke--a { opacity: .3; }
+  /* Fallback tier: keep the cobalt/violet/indigo colour story, drop the cyan
+     accent, and lower blur to stay light on the GPU. */
+  .la-fb { filter: blur(42px); }
+  .la-fb--cyan { display: none; }
 }
 
 /* ============================ REDUCED MOTION ============================ */
@@ -796,23 +713,15 @@ h3 { font-size: clamp(1.5rem, 2.6vw, 2.1rem); letter-spacing: -.02em; }
   .cursor-glow { display: none; }
   .marquee-track { animation: none; }
 
-  /* Living Atmosphere → beautiful STATIC composition.
-     Global rule above already freezes the drift animations; here we lock in a
-     pleasing frozen frame and remove all pointer/scroll-driven motion. */
-  .la-glow { display: none; }
-  .la-masses { transform: none !important; }          /* kill scroll parallax */
-  .la-mass--cobalt  { transform: translate3d(3vw,3vh,0)   scale(1.08); }
-  .la-mass--violet  { transform: translate3d(-4vw,-3vh,0) scale(.96); }
-  .la-mass--indigo  { transform: translate3d(2vw,-2vh,0)  scale(1.1); }
-  .la-smoke--a { transform: translate3d(2%,1%,0) scale(1.16); }
-  .la-smoke--b { transform: translate3d(-2%,-2%,0) scale(1.07); }
-  .la-mist     { transform: scale(1.1); }
+  /* Living Atmosphere → beautiful STATIC composition. app.js renders exactly
+     one shader frame (no rAF loop) for reduced-motion, so the WebGL canvas is
+     already a frozen frame. The .la-fallback (shown only when .no-webgl) is
+     static by nature. Nothing else to freeze here. */
 }
 
 /* ============================ PAUSED (tab hidden) ============================ */
-/* app.js sets this on the atmosphere when the tab is backgrounded so the GPU
-   idles instead of animating an invisible page. */
-.living-atmosphere.is-paused * { animation-play-state: paused !important; }
+/* app.js cancels the GL render loop on visibilitychange so the GPU idles when
+   the tab is backgrounded (nothing CSS-animated remains in the atmosphere). */
 
 /* ============================ PWA / STANDALONE ============================ */
 @media (display-mode: standalone) {
