@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Request a Build — The Quiet Few Collective</title>
+  <meta name="description" content="Request a premium website, web app, or mobile app and receive an intelligent planning range." />
+  <meta name="theme-color" content="#070c1a" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/favicon-32.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="request.css" />
+</head>
+<body class="request-page">
+  <div class="request-atmosphere" aria-hidden="true"></div>
+  <a class="skip-link" href="#requestForm">Skip to request form</a>
+  <header class="site-header scrolled">
+    <a class="brand" href="index.html" aria-label="The Quiet Few Collective home">
+      <img src="assets/quiet-few-emblem.png" alt="" width="46" height="46" />
+      <span class="brand-name">The Quiet Few<span class="brand-sub"> Collective</span></span>
+    </a>
+    <nav class="nav" aria-label="Request navigation"><a href="index.html#apps">Apps</a><a href="index.html#mission">Mission</a><a href="request.html" class="nav-cta active">Request a build</a></nav>
+  </header>
+
+  <main class="request-shell">
+    <section class="request-intro">
+      <p class="section-kicker">Private digital studio</p>
+      <h1>Bring the idea. We’ll shape the signal.</h1>
+      <p>Tell us what you want to create. You’ll see an immediate planning range, then receive a carefully reviewed scope—not a generic automated pitch.</p>
+      <ol class="request-steps"><li><b>01</b><span>Define the outcome</span></li><li><b>02</b><span>See a planning range</span></li><li><b>03</b><span>Receive a private response</span></li></ol>
+    </section>
+
+    <form class="request-card" id="requestForm" novalidate>
+      <div class="request-card-head"><div><small>PROJECT SIGNAL / 01</small><h2>Shape your build</h2></div><span>PRIVATE INTAKE</span></div>
+      <div class="form-row"><label for="name">Your name</label><input id="name" name="name" autocomplete="name" required maxlength="100" /></div>
+      <div class="form-split"><div class="form-row"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="160" /></div><div class="form-row"><label for="phone">Phone <span>(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40" /></div></div>
+      <fieldset><legend>What are we creating?</legend><div class="project-types"><label><input type="radio" name="kind" value="Website" checked /><span>↗</span>Website</label><label><input type="radio" name="kind" value="Web app" /><span>◇</span>Web app</label><label><input type="radio" name="kind" value="Mobile app" /><span>▯</span>Mobile app</label></div></fieldset>
+      <div class="range-line"><label for="pages">Estimated screens or pages</label><output id="pageCount">5</output></div><input id="pages" name="pages" type="range" min="1" max="30" value="5" />
+      <fieldset><legend>Capabilities</legend><div class="feature-chips" id="features">
+        <label><input type="checkbox" value="Payments" checked /><span>Payments</span></label><label><input type="checkbox" value="Booking" checked /><span>Booking</span></label><label><input type="checkbox" value="Memberships" /><span>Memberships</span></label><label><input type="checkbox" value="AI assistant" /><span>AI assistant</span></label><label><input type="checkbox" value="E-commerce" /><span>E-commerce</span></label><label><input type="checkbox" value="Admin portal" /><span>Admin portal</span></label>
+      </div></fieldset>
+      <div class="form-row"><label for="vision">What should this change for your customer?</label><textarea id="vision" name="vision" required maxlength="3000" placeholder="The problem, the people, and what a great outcome looks like…"></textarea></div>
+      <div class="form-split"><div class="form-row"><label for="budget">Comfortable investment</label><select id="budget" name="budget"><option>Not sure yet</option><option>$2,500–$5,000</option><option>$5,000–$10,000</option><option>$10,000–$25,000</option><option>$25,000+</option></select></div><div class="form-row"><label for="timeline">Desired timeline</label><select id="timeline" name="timeline"><option>Flexible</option><option>2–4 weeks</option><option>1–2 months</option><option>3+ months</option></select></div></div>
+      <div class="domain-choice"><label><input id="needsDomain" name="needsDomain" type="checkbox" /><span>I need help choosing and connecting a domain</span></label><div id="domainPanel" hidden><label for="domainIdea">Preferred name or keywords</label><input id="domainIdea" name="domainIdea" maxlength="120" placeholder="Example: quiet electric, northline…" /><p>We’ll return available options with live registrar links. The domain stays legally owned by you.</p></div></div>
+      <input class="hp-field" name="company_website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div class="planning-range"><div><small>INITIAL PLANNING RANGE</small><strong id="quoteRange">$4,750 – $6,900</strong></div><span>Refined after discovery</span></div>
+      <label class="consent"><input type="checkbox" required /><span>I agree to be contacted about this request. This estimate is informational and not a binding offer.</span></label>
+      <button class="submit-build" type="submit"><span>Request a private consultation</span><b>↗</b></button>
+      <p class="form-status" id="requestStatus" role="status" aria-live="polite">No obligation. A tailored response is normally sent within one business day.</p>
+    </form>
+  </main>
+  <footer class="site-footer"><a class="footer-brand" href="index.html"><img src="assets/quiet-few-wordmark-icon.png" alt="The Quiet Few Collective" /></a><p class="footer-copy">Built quiet. Moved precise.</p></footer>
+  <script src="request.js" defer></script>
+</body>
+</html>
