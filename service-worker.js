@@ -11,7 +11,10 @@ const CACHE_NAME = `quiet-few-${CACHE_VERSION}`;
 
 const APP_SHELL = [
   "./",
-  "./index.html",\n  "./request.html",\n  "./request.css",\n  "./request.js",
+  "./index.html",
+  "./request.html",
+  "./request.css",
+  "./request.js",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
