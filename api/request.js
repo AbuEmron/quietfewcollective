@@ -1,5 +1,5 @@
 const EMAIL_TO = "itsleftybro@thequietfewcollective.com";
-const SMS_TO = "+16072023131";
+const SMS_TO = "+16072013131";
 
 function clean(value, max = 3000) {
   return String(value ?? "").replace(/[<>]/g, "").trim().slice(0, max);
