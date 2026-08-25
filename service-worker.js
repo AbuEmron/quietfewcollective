@@ -6,12 +6,15 @@
      • Static assets -> cache-first, revalidate in the background.
    Bump CACHE_VERSION whenever you change cached files to ship an update.
    ===================================================================== */
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2-request-studio";
 const CACHE_NAME = `quiet-few-${CACHE_VERSION}`;
 
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./request.html",
+  "./request.css",
+  "./request.js",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
