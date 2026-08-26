@@ -9,13 +9,43 @@
   const domainPanel = form.querySelector("#domainPanel");
 
   const selections = () => [...form.querySelectorAll("#features input:checked")].map((input) => input.value);
+  // Quiet Few 2026 fair-market rate card.
+  // Custom studio pricing: below conventional US agency pricing, while preserving
+  // enough budget for discovery, bespoke UI/UX, engineering, QA, launch, and revisions.
+  const RATE_CARD = {
+    "Website": {
+      base: 1800, includedScreens: 3, extraScreen: 250, uncertainty: 1.25,
+      features: { "Payments": 750, "Booking": 650, "Memberships": 950, "AI assistant": 1800, "E-commerce": 1800, "Admin portal": 1200 }
+    },
+    "Web app": {
+      base: 9500, includedScreens: 3, extraScreen: 450, uncertainty: 1.35,
+      features: { "Payments": 1500, "Booking": 1300, "Memberships": 2200, "AI assistant": 3500, "E-commerce": 3500, "Admin portal": 2800 }
+    },
+    "Mobile app": {
+      base: 12500, includedScreens: 3, extraScreen: 500, uncertainty: 1.35,
+      features: { "Payments": 1700, "Booking": 1500, "Memberships": 2500, "AI assistant": 4000, "E-commerce": 4000, "Admin portal": 3200 }
+    }
+  };
+  const roundTo50 = (amount) => Math.round(amount / 50) * 50;
+
   function updateQuote() {
     const kind = form.querySelector('input[name="kind"]:checked').value;
-    const base = kind === "Website" ? 2400 : kind === "Web app" ? 7200 : 9800;
-    const total = base + Math.max(0, Number(pages.value) - 3) * 325 + selections().length * 850 + (needsDomain.checked ? 250 : 0);
+    const selected = selections();
+    const rate = RATE_CARD[kind];
+    let subtotal = rate.base + Math.max(0, Number(pages.value) - rate.includedScreens) * rate.extraScreen;
+    subtotal += selected.reduce((sum, feature) => sum + (rate.features[feature] || 0), 0);
+
+    // E-commerce and memberships already include much of the payment setup.
+    // Avoid charging the customer twice for overlapping implementation work.
+    if (selected.includes("Payments") && selected.includes("E-commerce")) subtotal -= rate.features.Payments * 0.65;
+    if (selected.includes("Payments") && selected.includes("Memberships")) subtotal -= rate.features.Payments * 0.35;
+    if (needsDomain.checked) subtotal += 150;
+
+    const low = roundTo50(subtotal);
+    const high = roundTo50(subtotal * rate.uncertainty);
     pageCount.value = pages.value;
-    quoteRange.textContent = "$" + total.toLocaleString() + " – $" + Math.round(total * 1.45).toLocaleString();
-    return { low: total, high: Math.round(total * 1.45) };
+    quoteRange.textContent = "$" + low.toLocaleString() + " – $" + high.toLocaleString();
+    return { low, high, currency: "USD", pricingVersion: "2026.08" };
   }
   form.addEventListener("input", updateQuote);
   needsDomain.addEventListener("change", () => { domainPanel.hidden = !needsDomain.checked; updateQuote(); });
